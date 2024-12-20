@@ -6,13 +6,13 @@
 			"label": "go: build package",
 			"command": "build",
 			"args": [
-				"${fileDirname}"
+				"1.go"
 			],
 			"problemMatcher": [
 				"$go"
 			],
 			"group": "build",
-			"detail": "cd /home/user/CODE/Golang; go build ${fileDirname}"
+			"detail": "cd /home/user/CODE/Golang; go build 1.go"
 		}
 	]
 }
