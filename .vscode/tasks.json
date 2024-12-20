@@ -6,7 +6,7 @@
 			"label": "go: build package",
 			"command": "build",
 			"args": [
-				"1.go"
+				"2.go"
 			],
 			"problemMatcher": [
 				"$go"
