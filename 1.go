@@ -13,7 +13,6 @@ func add(x int,y int) int {
 
 func twoReturns(x int ,y int) (int,int) {
 	return 0,0;
-	return x,y;
 }
 
 func fiveReturns() (int,int,int,bool) {
