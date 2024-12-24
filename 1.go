@@ -3,7 +3,6 @@ package main
 //#include<stdio.h>
 //void hello();
 
-
 import "C"
 import "fmt"
 
