@@ -1,7 +1,7 @@
 package main
 
 import (
-	"chatroom/Message"
+	"chatroom/message"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
