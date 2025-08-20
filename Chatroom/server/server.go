@@ -1,28 +1,42 @@
 package main
 
 import (
+	"context"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type Server struct {
 	ln net.Listener
 	conns Conns
 	isListening bool
+	redis redis.Client
+	userHashConn map[string]net.Conn
 }
 
 func NewServer() * Server {
 	return &Server{
 		conns: *NewConns(),
 		isListening: false,
+		redis: *redis.NewClient(&redis.Options{ Addr: "localhost:6379", }),
+		userHashConn: make(map[string]net.Conn),
 	}
 }
 
 func (s * Server)Run() {
+	_,err := s.redis.Ping(context.Background()).Result()
+	if err == nil {
+		log.Println("redis connected!")
+	} else {
+		log.Println("redis connect failed!")
+		os.Exit(-1)
+	}
 	go s.GetCommand()
 	for {
 		conn,_ := s.ln.Accept()

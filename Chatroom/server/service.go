@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "github.com/redis/go-redis/v9"
+	"context"
 	"encoding/binary"
 	"encoding/json"
 	"log"
@@ -17,8 +17,10 @@ func (s *Server)parseMessage(message string,conn net.Conn) {
 		s.onLogin(value["username"],value["passwd"],conn)
 	case "Register":
 		s.onRegister(value["username"],value["passwd"],conn)
+	case "Message":
+		s.onMessage(message)
 	default:
-		log.Println("解析错误")
+		log.Println("parse error")
 	}
 }
 
@@ -33,10 +35,34 @@ func (s *Server)send(msg string,conn net.Conn) {
 func (s *Server)onLogin(username string,passwd string,conn net.Conn) {
 	log.Println("A client is logging in")
 	log.Println("Username: " + username + " Password: " + passwd)
-	// database
-	s.send("OK",conn)
+
+	val,_ := s.redis.HGet(context.Background(),"nameHashPswd",username).Result()
+	if val == passwd {
+		s.send("OK",conn)
+		s.redis.SAdd(context.Background(),"onlineUser",username)
+		s.userHashConn[username] = conn
+	} else {
+		s.send("FAIL",conn)
+	}
 }
 
 func (s *Server)onRegister(username string,passwd string,conn net.Conn) {
 	log.Println("A client is registering")
+
+	exist,_ := s.redis.HExists(context.Background(),"nameHashPswd",username).Result()
+	
+	if exist {
+		s.send("FAIL",conn)
+	} else {
+		s.redis.HSet(context.Background(),"nameHashPswd",username,passwd)	
+		s.send("OK",conn)
+	}
+}
+
+func (s *Server)onMessage(message string) {
+	users,_ := s.redis.SMembers(context.Background(),"onlineUser").Result()
+	for _,user := range users {
+		conn := s.userHashConn[user]
+		s.send(message,conn)
+	}
 }
