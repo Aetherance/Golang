@@ -28,7 +28,7 @@ func (s * Server)Run() {
 		conn,_ := s.ln.Accept()
 		log.Println("New conn from: " + conn.RemoteAddr().String())
 		s.conns.addConn(conn)
-		go handleConn(conn)
+		go s.handleConn(conn)
 	}
 }
 
@@ -58,7 +58,7 @@ func (s * Server)GetCommand() {
 	}
 }
 
-func handleConn(conn net.Conn) {
+func (s *Server)handleConn(conn net.Conn) {
 	for {
 		lenBuf := [4]byte{}
 		_,err := io.ReadFull(conn,lenBuf[:])
@@ -77,6 +77,8 @@ func handleConn(conn net.Conn) {
 			return
 		}
 
-		fmt.Println(string(buff))
+		log.Println(string(buff))
+
+		s.parseMessage(string(buff),conn)
 	}
 }

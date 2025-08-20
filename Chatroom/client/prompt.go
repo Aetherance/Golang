@@ -38,9 +38,16 @@ func login() {
 	fmt.Println("密码: ")
 	fmt.Scan(&password)
 
-	client.RequestLogin(username,password)
+	if client.RequestLogin(username,password) {
+		fmt.Println("登录成功!")
+		chat()	
+	}
 }
 
 func register() {
 
+}
+
+func chat() {
+	
 }

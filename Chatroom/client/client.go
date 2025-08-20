@@ -57,7 +57,12 @@ func (c * Client) RequestLogin(username string,passwd string) bool {
 	msg["passwd"] = passwd
 	str,_ := json.Marshal(msg)
 	c.send(string(str))
-	return true
+	ret := c.recv()
+	if ret == "OK" {
+		return true
+	} else {
+		return false
+	}
 }
 
 func (c * Client) RequestRegister() {
