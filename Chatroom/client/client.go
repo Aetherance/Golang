@@ -1,14 +1,22 @@
 package main
 
-import "net"
+import (
+	// "chatroom/Message"
+	"encoding/binary"
+	"encoding/json"
+	"io"
+	"log"
+	"net"
+)
 
 type Client struct {
 	addr string
+	conn net.Conn
 }
 
 func NewClient() * Client {
 	return &Client{
-		
+
 	}
 }
 
@@ -21,11 +29,37 @@ func (c * Client) Connect() {
 		println("Nil addr")
 		return
 	}
-	net.Dial("tcp",c.addr)
+	conn,_ := net.Dial("tcp",c.addr)
+	c.conn = conn
 }
 
-func main() {
-	client := NewClient()
-	client.setAddr("localhost:8080")
-	client.Connect()
+func (c*Client) send(message string) {
+	length := make([]byte,4)
+	binary.BigEndian.PutUint32(length,uint32(len(message)))
+	length = append(length, []byte(message)...)
+	log.Println(string(length))
+	c.conn.Write(length)
+}
+
+func (c*Client) recv() string {
+	length := make([]byte,4)
+	io.ReadFull(c.conn,length)
+	Len := binary.BigEndian.Uint32(length)
+	buff := make([]byte,Len)
+	io.ReadFull(c.conn,buff)
+	return string(buff)
+}
+
+func (c * Client) RequestLogin(username string,passwd string) bool {
+	msg := map[string]string{}
+	msg["action"] = "Login"
+	msg["username"] = username
+	msg["passwd"] = passwd
+	str,_ := json.Marshal(msg)
+	c.send(string(str))
+	return true
+}
+
+func (c * Client) RequestRegister() {
+
 }

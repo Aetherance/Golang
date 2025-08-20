@@ -77,6 +77,6 @@ func handleConn(conn net.Conn) {
 			return
 		}
 
-		fmt.Println(buff)
+		fmt.Println(string(buff))
 	}
 }
